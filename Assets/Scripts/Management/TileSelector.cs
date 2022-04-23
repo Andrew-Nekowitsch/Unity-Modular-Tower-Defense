@@ -4,19 +4,8 @@ using UnityEngine;
 
 public class TileSelector : MonoBehaviour
 {
-    private GameObject selector;
-    public GameObject prefab_Selector;
-
-    private float x;
-    private float y;
-
-    public void InstantiateSelector(Transform t, Vector3 pos)
-    {
-        selector = GameObject.Instantiate(prefab_Selector, t);
-        selector.transform.position = pos;
-        x = pos.x;
-        y = pos.y;
-    }
+    public float x;
+    public float y;
 
     public void ShiftSelector(DirectionType dir)
     {
@@ -35,6 +24,6 @@ public class TileSelector : MonoBehaviour
                 x -= Gameboard.TILE_SIZE;
                 break;
         }
-        selector.transform.position = new Vector3(x, y, 0);
+        gameObject.transform.position = new Vector3(x, y, 0);
     }
 }

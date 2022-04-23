@@ -1,16 +1,17 @@
 public interface IBoard
 {
-    ITile[,] tiles { get;  }
-    ITile startingTile { get;  }
-    ITile currentTile { get;  }
-    int width { get;  }
-    int height { get;  }
+    ITile[,] Tiles { get;  }
+    ITile StartingTile { get;  }
+    ITile CurrentTile { get;  }
+    int Width { get;  }
+    int Height { get;  }
 
     void Add(ITile t);
     ITile GetTileAt(int x, int y);
+    void Setup();
     void InitializeBorders();
     void InitializeStartingLocation();
-    void InitializeTiles();
+    void InitializeInsideTiles();
     void Log();
     void SetNeighbors(ITile t);
     ITile NorthOf(ITile t);

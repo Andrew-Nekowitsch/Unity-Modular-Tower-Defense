@@ -1,46 +1,51 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 class Tile : ITile
 {
-    public TileType type { get; set; }
-    public bool visible { get; set; }
-    public int x { get; set; }
-    public int y { get; set; }
-    public Neighbors neighbors { get; set; }
-    public DirectionType directionHome { get; set; }
+    public TileType Type { get; set; }
+    public bool Visible { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public Neighbors Neighbors { get; set; }
+    public DirectionType DirectionHome { get; set; }
 
-    public Tile(int x, int y)
+    public Section[,] sections {get; set;}
+
+    public Tile(int x, int y, int numSections = 5)
     {
-        this.visible = false;
-        this.x = x;
-        this.y = y;
+        sections = new Section[numSections, numSections];
         Initialize(x, y);
     }
-    public Tile(int x, int y, TileType type)
+    public Tile(int x, int y, TileType type, int numSections = 5)
     {
-        this.visible = false;
-        this.x = x;
-        this.y = y;
-        this.type = type;
+        this.Type = type;
+        sections = new Section[numSections, numSections];
         Initialize(x, y);
     }
 
     public void Initialize(int x, int y)
     {
-        this.neighbors = new Neighbors();
+        this.X = x;
+        this.Y = y;
+        Visible = false;
+        Neighbors = new Neighbors();
         SetCoordinates(x, y);
     }
 
-    public void SetCoordinates(int _x, int _y)
+    public void SetCoordinates(int x, int y)
     {
-        this.x = _x;
-        this.y = _y;
+        this.X = x;
+        this.Y = y;
     }
 
-    public void AddNeightbor(DirectionType dir)
+    public void SetNeighbors(ITile n, ITile e, ITile s, ITile w)
     {
-
+        Neighbors.north = n;
+        Neighbors.east = e;
+        Neighbors.south = s;
+        Neighbors.west = w;
     }
+
+    public override string ToString()
+    {
+        return Type.ToString();
+	}
 }

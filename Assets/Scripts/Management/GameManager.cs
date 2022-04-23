@@ -12,8 +12,13 @@ public class GameManager : MonoBehaviour
         cameraController = GetComponent<CameraController>();
     }
 
-    // Update is called once per frame
-    void Update()
+	private void Start()
+	{
+        SetCameraInitialPosition();
+    }
+
+	// Update is called once per frame
+	void Update()
     {
         GetUserInput();
     }
@@ -54,6 +59,11 @@ public class GameManager : MonoBehaviour
             MoveRight();
         }
     }
+
+    private void SetCameraInitialPosition()
+    {
+        cameraController.SetPosition(gameBoard.selector.transform.position.x, gameBoard.selector.transform.position.y, -100);
+	}
 
     private void MoveUp()
     {

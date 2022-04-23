@@ -4,13 +4,15 @@ using UnityEngine;
 
 public interface ITile
 {
-    TileType type { get; set; }
-    bool visible { get; set; }
-    int x { get; set; }
-    int y { get; set; }
-    Neighbors neighbors { get; set; }
-    DirectionType directionHome { get; set; }
+    TileType Type { get; set; }
+    bool Visible { get; set; }
+    int X { get; set; }
+    int Y { get; set; }
+    Neighbors Neighbors { get; set; }
+    DirectionType DirectionHome { get; set; }
 
     void Initialize(int x, int y);
     void SetCoordinates(int _x, int _y);
+    void SetNeighbors(ITile n, ITile e, ITile s, ITile w);
+    string ToString();
 }

@@ -18,9 +18,7 @@ public class CameraController : MonoBehaviour
             cam = Camera.main;
         }
 
-        x = cam.transform.position.x;
-        y = cam.transform.position.y;
-        z = cam.transform.position.z;
+        SetXYZ();
     }
 
     public void MoveCamera(DirectionType dir)
@@ -44,4 +42,17 @@ public class CameraController : MonoBehaviour
         }
         cam.transform.position = new Vector3(x, y, z);
     }
+
+    private void SetXYZ()
+    {
+        x = cam.transform.position.x;
+        y = cam.transform.position.y;
+        z = cam.transform.position.z;
+    }
+
+    public void SetPosition(float x, float y, float z)
+    {
+        cam.transform.position = new Vector3(x, y, z);
+        SetXYZ();
+	}
 }
