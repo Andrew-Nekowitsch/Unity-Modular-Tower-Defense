@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class Gameboard : MonoBehaviour
 {
+
+	public static Gameboard Instance { get; set; }
+
 	public IBoard board;
-	public GameObject[,] boardObjects;
 	public TileSelector selector;
 	public int width = 20;
 	public int height = 20;
 	public const int TILE_SIZE = 10;
+	public const int NUM_SECTIONS_PER_TILE = 5;
 
 	public GameObject prefab_Unknown;
 	public GameObject prefab_Start;
@@ -23,37 +26,7 @@ public class Gameboard : MonoBehaviour
 	private void Awake()
 	{
 		InstantiateHierarchy();
-		InstantiateBoard();
-	}
-
-	public void InstantiateTile(ITile tile)
-	{
-		tile.Visible = true;
-		Instantiate(tile);
-
-		if (tile.Type == TileType.Border)
-			return;
-
-		if (tile.Neighbors.north.Type == TileType.Unknown || tile.Neighbors.north.Type == TileType.Border)
-		{
-			Instantiate(new Tile(tile.X, tile.Y + 1, TileType.Unknown));
-			tile.Neighbors.north.Visible = true;
-		}
-		if (tile.Neighbors.south.Type == TileType.Unknown || tile.Neighbors.south.Type == TileType.Border)
-		{
-			Instantiate(new Tile(tile.X, tile.Y - 1, TileType.Unknown));
-			tile.Neighbors.south.Visible = true;
-		}
-		if (tile.Neighbors.east.Type == TileType.Unknown || tile.Neighbors.east.Type == TileType.Border)
-		{
-			Instantiate(new Tile(tile.X + 1, tile.Y, TileType.Unknown));
-			tile.Neighbors.east.Visible = true;
-		}
-		if (tile.Neighbors.west.Type == TileType.Unknown || tile.Neighbors.west.Type == TileType.Border)
-		{
-			Instantiate(new Tile(tile.X - 1, tile.Y, TileType.Unknown));
-			tile.Neighbors.west.Visible = true;
-		}
+		InitializeBoard();
 	}
 
 	private void InstantiateHierarchy()
@@ -69,13 +42,59 @@ public class Gameboard : MonoBehaviour
 		}
 	}
 
-	public void InstantiateBoard()
+	public void InitializeBoard()
 	{
-		board = new RectBoard(width, height);
-		boardObjects = new GameObject[width + 2, height + 2];
-
-		InstantiateTile(board.StartingTile);
+		Setup();
 		InstantiateSelector(gameObject.transform, new Vector3(board.StartingTile.X * TILE_SIZE, board.StartingTile.Y * TILE_SIZE, 0));
+	}
+
+	public void Setup()
+	{
+		board = new RectBoard
+		{
+			Tiles = new Tile[width, height]
+		};
+		InitializeBorders();
+		InitializeInsideTiles();
+		InitializeStartingLocation();
+	}
+
+	public void InitializeBorders()
+	{
+		for (int x = 0; x < width; x++)
+		{
+			board.AddHidden(new Tile(x, 0, TileType.Border), GetPrefab(TileType.Border));
+			board.AddHidden(new Tile(x, height - 1, TileType.Border), GetPrefab(TileType.Border));
+		}
+		for (int y = 1; y < height - 1; y++)
+		{
+			board.AddHidden(new Tile(0, y, TileType.Border), GetPrefab(TileType.Border));
+			board.AddHidden(new Tile(width - 1, y, TileType.Border), GetPrefab(TileType.Border));
+		}
+	}
+
+	public void InitializeInsideTiles()
+	{
+		for (int x = 1; x < width - 1; x++)
+		{
+			for (int y = 1; y < height - 1; y++)
+			{
+				board.AddWithoutInstantiation(new Tile(x, y, TileType.Unknown));
+			}
+		}
+
+		board.SetNeighbors();
+	}
+
+	public void InitializeStartingLocation()
+	{
+		int x = Random.Range(1, width - 1);
+		int y = Random.Range(1, height - 1);
+		board.StartingTile = board.GetTileAt(x, y);
+		board.StartingTile.SetTileType(TileType.Start);
+		board.CurrentTile = board.StartingTile;
+		board.CurrentTile.SetVisible(Visibility.Visible);
+		board.InstantiateTile(board.CurrentTile, GetPrefab(TileType.Start));
 	}
 
 	public void InstantiateSelector(Transform t, Vector3 pos)
@@ -85,21 +104,6 @@ public class Gameboard : MonoBehaviour
 		go.transform.position = pos;
 		selector.x = pos.x;
 		selector.y = pos.y;
-	}
-
-	private void Instantiate(ITile t)
-	{
-		GameObject objParentInHierarchy = GameObject.Find(t.ToString());
-		GameObject objCoordsInHierarchy = new GameObject("[" + t.X + ", " + t.Y + "]");
-		objCoordsInHierarchy.transform.parent = objParentInHierarchy.transform;
-
-		if (boardObjects[t.X, t.Y] != null && board.Tiles[t.X, t.Y].Type == TileType.Unknown)
-			Destroy(boardObjects[t.X, t.Y].transform.parent.gameObject);
-
-		boardObjects[t.X, t.Y] = GameObject.Instantiate(GetPrefab(t.Type), new Vector3(t.X * TILE_SIZE, t.Y * TILE_SIZE, 0), Quaternion.identity, objCoordsInHierarchy.transform);
-
-		if (t.Type != TileType.Unknown && t.Type != TileType.Start && t.Visible == false)
-			boardObjects[t.X, t.Y].SetActive(false);
 	}
 
 	private GameObject GetPrefab(TileType type)
@@ -132,78 +136,58 @@ public class Gameboard : MonoBehaviour
 
 	public void Research(DirectionType dir)
 	{
-		if (board.CurrentTile.Type != TileType.Path && board.CurrentTile.Type != TileType.Start)
+		if (board.CurrentTile.GetTileType() != TileType.Path && board.CurrentTile.GetTileType() != TileType.Start)
 			return;
 
 		if (dir == DirectionType.Up)
 		{
-			if (board.NorthOf(board.CurrentTile).Type != TileType.Unknown)
-			{
-				InstantiateTile(board.NorthOf(board.CurrentTile));
-				return;
-			}
-
-			board.CurrentTile.Neighbors.north = GenerateTileType(board.CurrentTile.X, board.CurrentTile.Y + 1);
-			board.Add(board.CurrentTile.Neighbors.north);
-			InstantiateTile(board.CurrentTile.Neighbors.north);
+			ResearchTile(board.NorthOf(board.CurrentTile));
 		}
 		else if (dir == DirectionType.Down)
 		{
-			if (board.SouthOf(board.CurrentTile).Type != TileType.Unknown)
-			{
-				InstantiateTile(board.SouthOf(board.CurrentTile));
-				return;
-			}
-
-			board.CurrentTile.Neighbors.south = GenerateTileType(board.CurrentTile.X, board.CurrentTile.Y - 1);
-			board.Add(board.CurrentTile.Neighbors.south);
-			InstantiateTile(board.CurrentTile.Neighbors.south);
+			ResearchTile(board.SouthOf(board.CurrentTile));
 		}
 		else if (dir == DirectionType.Right)
 		{
-			if (board.EastOf(board.CurrentTile).Type != TileType.Unknown)
-			{
-				InstantiateTile(board.EastOf(board.CurrentTile));
-				return;
-			}
-
-			board.CurrentTile.Neighbors.east = GenerateTileType(board.CurrentTile.X + 1, board.CurrentTile.Y);
-			board.Add(board.CurrentTile.Neighbors.east);
-			InstantiateTile(board.CurrentTile.Neighbors.east);
+			ResearchTile(board.EastOf(board.CurrentTile));
 		}
 		else if (dir == DirectionType.Left)
 		{
-			if (board.WestOf(board.CurrentTile).Type != TileType.Unknown)
-			{
-				InstantiateTile(board.WestOf(board.CurrentTile));
-				return;
-			}
-
-			board.CurrentTile.Neighbors.west = GenerateTileType(board.CurrentTile.X - 1, board.CurrentTile.Y);
-			board.Add(board.CurrentTile.Neighbors.west);
-			InstantiateTile(board.CurrentTile.Neighbors.west);
+			ResearchTile(board.WestOf(board.CurrentTile));
 		}
 	}
 
-	private Tile GenerateTileType(int x, int y)
+	private void ResearchTile(ITile tile)
 	{
-		Tile t = new Tile(x, y);
+		if (tile.GetVisible() == Visibility.Visible)
+			return;
+		if (tile.GetTileType() != TileType.Border)
+		{
+			tile = board.GetTileAt(tile.X, tile.Y);
+			tile.SetTileType(GenerateTileType());
+		}
+		board.Research(tile, GetPrefab(tile.GetTileType()));
+	}
+
+	// TODO: make variable odds based on currently placed tiles
+	private TileType GenerateTileType()
+	{
+		TileType type;
 		int num = Random.Range(0, 100);
 		if (num >= 20) // 80%
 		{
-			t.Type = TileType.Path;
+			type = TileType.Path;
 		}
 		else if (num >= 5) // 15%
 		{
-			t.Type = TileType.Obstacle;
+			type = TileType.Obstacle;
 		}
 		else // 5%
 		{
-			t.Type = TileType.End;
+			type = TileType.End;
 		}
 
-		t.Visible = true;
-		return t;
+		return type;
 	}
 
 	public void Up()

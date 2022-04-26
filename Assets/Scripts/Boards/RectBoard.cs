@@ -6,90 +6,51 @@ public class RectBoard : IBoard
 	public ITile[,] Tiles { get; set; }
 	public ITile StartingTile { get; set; }
 	public ITile CurrentTile { get; set; }
-	public int Width { get; set; }
-	public int Height { get; set; }
+	private readonly Gameboard gb = Singleton.Instance.Gameboard;
 
-	public RectBoard(int x = 20, int y = 20)
+	public void InstantiateTile(ITile tile, GameObject prefab)
 	{
-		Width = x + 2;
-		Height = y + 2;
+		tile.Instantiate(prefab, GameObject.Find(tile.ToString()));
 
-		Setup();
-
-		Log();
-	}
-
-	public void Setup()
-	{
-		Tiles = new Tile[Width, Height];
-
-		InitializeInsideTiles();
-		InitializeBorders();
-		InitializeStartingLocation();
-		SetNeighbors();
-	}
-
-	public void InitializeInsideTiles()
-	{
-		for (int x = 1; x < Width - 1; x++)
+		if (tile.GetTileType() == TileType.Border && tile.GetVisible() == Visibility.Unknown)
 		{
-			for (int y = 1; y < Height - 1; y++)
+			tile.SetVisibility(Visibility.Visible);
+			return;
+		}
+
+		ITile[] neighbors = { NorthOf(tile), EastOf(tile), SouthOf(tile), WestOf(tile) };
+		foreach (ITile tileRef in neighbors)
+		{
+			if (tileRef == null) continue;
+			if (tileRef.GetTileType() == TileType.Unknown || (tileRef.GetTileType() == TileType.Border && tileRef.GetVisible() == Visibility.Hidden))
 			{
-				AddWithoutNeighbors(new Tile(x, y, TileType.Unknown));
+				tileRef.Instantiate(gb.prefab_Unknown, GameObject.Find(tileRef.ToString()));
+				tile.SetVisibility(Visibility.Unknown);
 			}
 		}
 	}
 
-	public void InitializeBorders()
+	public void InstantiateBorder(ITile tile)
 	{
-		for (int w = 0; w < Width; w++)
-		{
-			AddWithoutNeighbors(new Tile(w, 0, TileType.Border));
-			AddWithoutNeighbors(new Tile(w, Height - 1, TileType.Border));
-		}
-		for (int h = 0; h < Height; h++)
-		{
-			AddWithoutNeighbors(new Tile(0, h, TileType.Border));
-			AddWithoutNeighbors(new Tile(Width - 1, h, TileType.Border));
-		}
-	}
-
-	public void InitializeStartingLocation()
-	{
-		int x = Random.Range(1, Width - 1);
-		int y = Random.Range(1, Height - 1);
-		StartingTile = new Tile(x, y, TileType.Start);
-		AddWithoutNeighbors(StartingTile);
-
-		CurrentTile = StartingTile;
+		GameObject objParentInHierarchy = GameObject.Find(tile.ToString());
+		tile.Instantiate(gb.prefab_Border, objParentInHierarchy);
+		tile.SetVisibility(Visibility.Hidden);
 	}
 
 	public ITile GetTileAt(int x, int y)
 	{
-		if (x < 0 || x >= Width || y < 0 || y >= Height)
+		if (InvalidTileLocation(x, y))
 			return null;
 		return Tiles[x, y];
 	}
 
-	public ITile NorthOf(ITile t)
-	{
-		return GetTileAt(t.X, t.Y + 1);
-	}
+	public ITile NorthOf(ITile t) => GetTileAt(t.X, t.Y + 1);
 
-	public ITile EastOf(ITile t)
-	{
-		return GetTileAt(t.X + 1, t.Y);
-	}
+	public ITile EastOf(ITile t) => GetTileAt(t.X + 1, t.Y);
 
-	public ITile SouthOf(ITile t)
-	{
-		return GetTileAt(t.X, t.Y - 1);
-	}
+	public ITile SouthOf(ITile t) => GetTileAt(t.X, t.Y - 1);
 
-	public ITile WestOf(ITile t)
-	{
-		return GetTileAt(t.X - 1, t.Y);
-	}
+	public ITile WestOf(ITile t) => GetTileAt(t.X - 1, t.Y);
 
 	public void ShiftCurrentTile(DirectionType dir)
 	{
@@ -112,48 +73,79 @@ public class RectBoard : IBoard
 		}
 	}
 
-	public void Add(ITile t)
+	public bool AddHidden(ITile t, GameObject prefab)
 	{
-		if (AddWithoutNeighbors(t))
-			SetNeighbors(t);
+		if (AddWithoutInstantiation(t))
+		{
+			t.SetVisible(Visibility.Hidden);
+			InstantiateBorder(Tiles[t.X, t.Y]);
+			return true;
+		}
+		return false;
 	}
 
-	public bool AddWithoutNeighbors(ITile t)
+	public bool Add(ITile t, GameObject prefab)
 	{
-		if (t.X < 0 || t.X >= Width || t.Y < 0 || t.Y >= Height)
+		if (AddWithoutNeighbors(t, prefab))
+		{
+			SetNeighbors(t);
+			return true;
+		}
+		return false;
+	}
+
+	public bool AddWithoutNeighbors(ITile t, GameObject prefab)
+	{
+		if (AddWithoutInstantiation(t))
+		{
+			InstantiateTile(Tiles[t.X, t.Y], prefab);
+			return true;
+		}
+		return false;
+	}
+
+	public bool AddWithoutInstantiation(ITile t)
+	{
+		if (InvalidTileLocation(t))
 			return false;
 		Tiles[t.X, t.Y] = t;
 		return true;
 	}
 
+	public void Research(ITile t, GameObject prefab)
+	{
+		Add(t, prefab);
+	}
+
 	public void SetNeighbors()
 	{
-		for (int x = 0; x < Width; x++)
+		for (int x = 0; x < gb.width; x++)
 		{
-			for (int y = 0; y < Height; y++)
+			for (int y = 0; y < gb.height; y++)
 			{
 				SetNeighbors(Tiles[x, y]);
 			}
 		}
 	}
 
-	public void SetNeighbors(ITile t)
-	{
-		t.SetNeighbors(NorthOf(t), SouthOf(t), EastOf(t), WestOf(t));
-	}
+	public void SetNeighbors(ITile t) => t.SetNeighbors(NorthOf(t), SouthOf(t), EastOf(t), WestOf(t));
+
+	public bool InvalidTileLocation(ITile t) => InvalidTileLocation(t.X, t.Y);
+
+	public bool InvalidTileLocation(int x, int y) => x < 0 || x >= gb.width || y < 0 || y >= gb.height;
 
 	public void Log()
 	{
 		string str = "";
 
-		for (int y = 0; y < Height; y++)
+		for (int y = 0; y < gb.height; y++)
 		{
-			for (int x = 0; x < Width; x++)
+			for (int x = 0; x < gb.width; x++)
 			{
 				if (GetTileAt(x, y) == null)
 					str += "null??\t";
 				else
-					str += GetTileAt(x, y).Type.ToString().Substring(0, 1).ToUpper() + "\t";
+					str += GetTileAt(x, y).GetTileType().ToString().Substring(0, 1).ToUpper() + "\t";
 			}
 			str += "\n";
 		}

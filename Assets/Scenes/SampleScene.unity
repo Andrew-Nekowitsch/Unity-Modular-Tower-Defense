@@ -133,7 +133,6 @@ GameObject:
   m_Component:
   - component: {fileID: 536615459}
   - component: {fileID: 536615457}
-  - component: {fileID: 536615458}
   m_Layer: 0
   m_Name: Gameboard
   m_TagString: Untagged
@@ -153,26 +152,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7489bcc45125a0949a1f419a89a147e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 5
-  height: 5
+  selector: {fileID: 0}
+  width: 7
+  height: 7
   prefab_Unknown: {fileID: 1469210040907525419, guid: b2507dd67faa45548bff1bb4297d71e3, type: 3}
   prefab_Start: {fileID: 6792848797074864926, guid: 89988971035878f42875ba57685f5344, type: 3}
   prefab_Path: {fileID: 6999468624544354120, guid: 2d6af7539bf692246be238b8e3b36457, type: 3}
   prefab_Border: {fileID: 8638304340488292968, guid: 6bb2f0a3d8203864b9e8763b9ea9279f, type: 3}
   prefab_Obstacle: {fileID: 6232782443149845629, guid: ed9143d85d49a964ab960e0ce96ab134, type: 3}
   prefab_End: {fileID: 1539296626154439184, guid: 3dc76ba0877700d408833ba9f4729412, type: 3}
---- !u!114 &536615458
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536615456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ceb2981d99d47644bf3d1414321bbf4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   prefab_Selector: {fileID: 7255798563212611739, guid: 87a0ed66c1d19074582896c31b83dc8d, type: 3}
 --- !u!4 &536615459
 Transform:

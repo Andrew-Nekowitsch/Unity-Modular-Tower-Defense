@@ -12,4 +12,8 @@ public class Section : MonoBehaviour
     public GameObject SectionObject { get; set; }
     public ISection section { get; set; }
 
+    public Section(int num)
+    {
+
+	}
 }
