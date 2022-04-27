@@ -1,9 +1,9 @@
 public class Neighbors
 {
-    public ITile north;
-    public ITile south;
-    public ITile east;
-    public ITile west;
+    public IModule north;
+    public IModule south;
+    public IModule east;
+    public IModule west;
 
     public Neighbors()
     {
@@ -13,7 +13,7 @@ public class Neighbors
         west = null;
     }
 
-    public Neighbors(ITile n, ITile s, ITile e, ITile w)
+    public Neighbors(IModule n, IModule s, IModule e, IModule w)
     {
         north = n;
         south = s;

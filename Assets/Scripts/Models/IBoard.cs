@@ -2,26 +2,26 @@ using UnityEngine;
 
 public interface IBoard
 {
-	ITile[,] Tiles { get; set; }
-	ITile StartingTile { get; set; }
-	ITile CurrentTile { get; set; }
+	IModule[,] Modules { get; set; }
+	IModule StartingModule { get; set; }
+	IModule CurrentModule { get; set; }
 
-	void InstantiateTile(ITile tile, GameObject prefab);
-	void InstantiateBorder(ITile tile);
-	bool AddHidden(ITile t, GameObject prefab);
-	bool Add(ITile t, GameObject prefab);
-	bool AddWithoutNeighbors(ITile t, GameObject prefab);
-	bool AddWithoutInstantiation(ITile t);
-	ITile GetTileAt(int x, int y);
+	void InstantiateModule(IModule tile, GameObject prefab);
+	void InstantiateBorder(IModule tile);
+	bool AddHidden(IModule t, GameObject prefab);
+	bool Add(IModule t, GameObject prefab);
+	bool AddWithoutNeighbors(IModule t, GameObject prefab);
+	bool AddWithoutInstantiation(IModule t);
+	IModule GetModuleAt(int x, int y);
 	void Log();
 	void SetNeighbors();
-	void SetNeighbors(ITile t);
-	ITile NorthOf(ITile t);
-	ITile EastOf(ITile t);
-	ITile SouthOf(ITile t);
-	ITile WestOf(ITile t);
+	void SetNeighbors(IModule t);
+	IModule NorthOf(IModule t);
+	IModule EastOf(IModule t);
+	IModule SouthOf(IModule t);
+	IModule WestOf(IModule t);
 	void ShiftCurrentTile(DirectionType dir);
-	void Research(ITile t, GameObject prefab);
+	void Research(IModule t, GameObject prefab);
 	bool InvalidTileLocation(int x, int y);
-	bool InvalidTileLocation(ITile tile);
+	bool InvalidTileLocation(IModule tile);
 }

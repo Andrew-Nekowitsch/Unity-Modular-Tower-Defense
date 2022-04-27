@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileSelector : MonoBehaviour
+public class ModuleSelector : MonoBehaviour
 {
     public float x;
     public float y;
@@ -12,16 +12,16 @@ public class TileSelector : MonoBehaviour
         switch (dir)
         {
             case DirectionType.Up:
-                y += Gameboard.TILE_SIZE;
+                y += Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Right:
-                x += Gameboard.TILE_SIZE;
+                x += Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Down:
-                y -= Gameboard.TILE_SIZE;
+                y -= Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Left:
-                x -= Gameboard.TILE_SIZE;
+                x -= Gameboard.MODULE_SIZE;
                 break;
         }
         gameObject.transform.position = new Vector3(x, y, 0);

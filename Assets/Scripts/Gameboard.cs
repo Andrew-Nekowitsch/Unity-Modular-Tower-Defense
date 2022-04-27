@@ -1,18 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Gameboard : MonoBehaviour
 {
-
-	public static Gameboard Instance { get; set; }
-
 	public IBoard board;
-	public TileSelector selector;
+	public ModuleSelector selector;
 	public int width = 20;
 	public int height = 20;
-	public const int TILE_SIZE = 10;
-	public const int NUM_SECTIONS_PER_TILE = 5;
+	public const int MODULE_SIZE = 10;
+	public const int NUM_TILES_PER_MODULE = 5;
 
 	public GameObject prefab_Unknown;
 	public GameObject prefab_Start;
@@ -23,7 +18,7 @@ public class Gameboard : MonoBehaviour
 	public GameObject prefab_Selector;
 
 
-	private void Awake()
+	private void Start()
 	{
 		InstantiateHierarchy();
 		InitializeBoard();
@@ -31,7 +26,7 @@ public class Gameboard : MonoBehaviour
 
 	private void InstantiateHierarchy()
 	{
-		foreach (TileType t in System.Enum.GetValues(typeof(TileType)))
+		foreach (ModuleType t in System.Enum.GetValues(typeof(ModuleType)))
 		{
 			GameObject objParentInHierarchy = GameObject.Find(t.ToString());
 			if (objParentInHierarchy == null)
@@ -45,14 +40,14 @@ public class Gameboard : MonoBehaviour
 	public void InitializeBoard()
 	{
 		Setup();
-		InstantiateSelector(gameObject.transform, new Vector3(board.StartingTile.X * TILE_SIZE, board.StartingTile.Y * TILE_SIZE, 0));
+		InstantiateSelector(gameObject.transform, new Vector3(board.StartingModule.X * MODULE_SIZE, board.StartingModule.Y * MODULE_SIZE, 0));
 	}
 
 	public void Setup()
 	{
 		board = new RectBoard
 		{
-			Tiles = new Tile[width, height]
+			Modules = new Module[width, height]
 		};
 		InitializeBorders();
 		InitializeInsideTiles();
@@ -63,13 +58,13 @@ public class Gameboard : MonoBehaviour
 	{
 		for (int x = 0; x < width; x++)
 		{
-			board.AddHidden(new Tile(x, 0, TileType.Border), GetPrefab(TileType.Border));
-			board.AddHidden(new Tile(x, height - 1, TileType.Border), GetPrefab(TileType.Border));
+			board.AddHidden(new Module(x, 0, ModuleType.Border), GetPrefab(ModuleType.Border));
+			board.AddHidden(new Module(x, height - 1, ModuleType.Border), GetPrefab(ModuleType.Border));
 		}
 		for (int y = 1; y < height - 1; y++)
 		{
-			board.AddHidden(new Tile(0, y, TileType.Border), GetPrefab(TileType.Border));
-			board.AddHidden(new Tile(width - 1, y, TileType.Border), GetPrefab(TileType.Border));
+			board.AddHidden(new Module(0, y, ModuleType.Border), GetPrefab(ModuleType.Border));
+			board.AddHidden(new Module(width - 1, y, ModuleType.Border), GetPrefab(ModuleType.Border));
 		}
 	}
 
@@ -79,7 +74,7 @@ public class Gameboard : MonoBehaviour
 		{
 			for (int y = 1; y < height - 1; y++)
 			{
-				board.AddWithoutInstantiation(new Tile(x, y, TileType.Unknown));
+				board.AddWithoutInstantiation(new Module(x, y, ModuleType.Unknown));
 			}
 		}
 
@@ -90,43 +85,43 @@ public class Gameboard : MonoBehaviour
 	{
 		int x = Random.Range(1, width - 1);
 		int y = Random.Range(1, height - 1);
-		board.StartingTile = board.GetTileAt(x, y);
-		board.StartingTile.SetTileType(TileType.Start);
-		board.CurrentTile = board.StartingTile;
-		board.CurrentTile.SetVisible(Visibility.Visible);
-		board.InstantiateTile(board.CurrentTile, GetPrefab(TileType.Start));
+		board.StartingModule = board.GetModuleAt(x, y);
+		board.StartingModule.SetTileType(ModuleType.Start);
+		board.CurrentModule = board.StartingModule;
+		board.CurrentModule.SetVisible(Visibility.Visible);
+		board.InstantiateModule(board.CurrentModule, GetPrefab(ModuleType.Start));
 	}
 
 	public void InstantiateSelector(Transform t, Vector3 pos)
 	{
 		GameObject go = GameObject.Instantiate(prefab_Selector, t);
-		selector = go.GetComponent<TileSelector>();
+		selector = go.GetComponent<ModuleSelector>();
 		go.transform.position = pos;
 		selector.x = pos.x;
 		selector.y = pos.y;
 	}
 
-	private GameObject GetPrefab(TileType type)
+	private GameObject GetPrefab(ModuleType type)
 	{
 		GameObject prefab = prefab_Unknown;
 		switch (type)
 		{
-			case (TileType.Border):
+			case (ModuleType.Border):
 				prefab = prefab_Border;
 				break;
-			case (TileType.Start):
+			case (ModuleType.Start):
 				prefab = prefab_Start;
 				break;
-			case (TileType.End):
+			case (ModuleType.End):
 				prefab = prefab_End;
 				break;
-			case (TileType.Path):
+			case (ModuleType.Path):
 				prefab = prefab_Path;
 				break;
-			case (TileType.Obstacle):
+			case (ModuleType.Obstacle):
 				prefab = prefab_Obstacle;
 				break;
-			case (TileType.Unknown):
+			case (ModuleType.Unknown):
 			default:
 				break;
 		}
@@ -136,55 +131,55 @@ public class Gameboard : MonoBehaviour
 
 	public void Research(DirectionType dir)
 	{
-		if (board.CurrentTile.GetTileType() != TileType.Path && board.CurrentTile.GetTileType() != TileType.Start)
+		if (board.CurrentModule.GetTileType() != ModuleType.Path && board.CurrentModule.GetTileType() != ModuleType.Start)
 			return;
 
 		if (dir == DirectionType.Up)
 		{
-			ResearchTile(board.NorthOf(board.CurrentTile));
+			ResearchTile(board.NorthOf(board.CurrentModule));
 		}
 		else if (dir == DirectionType.Down)
 		{
-			ResearchTile(board.SouthOf(board.CurrentTile));
+			ResearchTile(board.SouthOf(board.CurrentModule));
 		}
 		else if (dir == DirectionType.Right)
 		{
-			ResearchTile(board.EastOf(board.CurrentTile));
+			ResearchTile(board.EastOf(board.CurrentModule));
 		}
 		else if (dir == DirectionType.Left)
 		{
-			ResearchTile(board.WestOf(board.CurrentTile));
+			ResearchTile(board.WestOf(board.CurrentModule));
 		}
 	}
 
-	private void ResearchTile(ITile tile)
+	private void ResearchTile(IModule tile)
 	{
 		if (tile.GetVisible() == Visibility.Visible)
 			return;
-		if (tile.GetTileType() != TileType.Border)
+		if (tile.GetTileType() != ModuleType.Border)
 		{
-			tile = board.GetTileAt(tile.X, tile.Y);
+			tile = board.GetModuleAt(tile.X, tile.Y);
 			tile.SetTileType(GenerateTileType());
 		}
 		board.Research(tile, GetPrefab(tile.GetTileType()));
 	}
 
 	// TODO: make variable odds based on currently placed tiles
-	private TileType GenerateTileType()
+	private ModuleType GenerateTileType()
 	{
-		TileType type;
+		ModuleType type;
 		int num = Random.Range(0, 100);
 		if (num >= 20) // 80%
 		{
-			type = TileType.Path;
+			type = ModuleType.Path;
 		}
 		else if (num >= 5) // 15%
 		{
-			type = TileType.Obstacle;
+			type = ModuleType.Obstacle;
 		}
 		else // 5%
 		{
-			type = TileType.End;
+			type = ModuleType.End;
 		}
 
 		return type;

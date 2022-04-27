@@ -1,40 +1,30 @@
 using UnityEngine;
 
-public enum Visibility
-{
-	Hidden,
-	Unknown,
-	Visible
-}
-
-class Tile : ITile
+class Module : IModule
 {
 	public int X { get; set; }
 	public int Y { get; set; }
 	public Neighbors Neighbors { get; set; }
 	public DirectionType WalkDir { get; set; }
-	public Section[,] Sections { get; set; }
+	public Tiles Tiles { get; set; }
 	private Visibility visible;
 	private GameObject gameObject;
-	private TileType type;
+	private ModuleType type;
 
-	public Tile(TileType type, int numSections)
+	public Module(ModuleType type)
 	{
 		this.SetVisible(Visibility.Hidden);
 		this.SetTileType(type);
-		SetNumSections(numSections);
 	}
-	public Tile(int x, int y, int numSections = 5)
+	public Module(int x, int y)
 	{
 		this.SetVisible(Visibility.Hidden);
-		SetNumSections(numSections);
 		Initialize(x, y);
 	}
-	public Tile(int x, int y, TileType type, int numSections = 5)
+	public Module(int x, int y, ModuleType type)
 	{
 		this.SetVisible(Visibility.Hidden);
 		this.SetTileType(type);
-		SetNumSections(numSections);
 		Initialize(x, y);
 	}
 
@@ -42,10 +32,11 @@ class Tile : ITile
 	{
 		this.SetGameObject(
 			GameObject.Instantiate(prefab,
-				new Vector3(X * Gameboard.TILE_SIZE, Y * Gameboard.TILE_SIZE, 0),
+				new Vector3(X * Gameboard.MODULE_SIZE, Y * Gameboard.MODULE_SIZE, 0),
 				Quaternion.identity, parent.transform)
 				);
 		this.GetGameObject().name = "[" + X + ", " + Y + "]";
+		Tiles = this.GetGameObject().GetComponent<Tiles>();
 	}
 
 	public void SetVisibility(Visibility v)
@@ -67,7 +58,7 @@ class Tile : ITile
 		this.Y = y;
 	}
 
-	public void SetNeighbors(ITile n, ITile e, ITile s, ITile w)
+	public void SetNeighbors(IModule n, IModule e, IModule s, IModule w)
 	{
 		Neighbors.north = n;
 		Neighbors.east = e;
@@ -80,14 +71,14 @@ class Tile : ITile
 		return GetTileType().ToString();
 	}
 
-	public TileType GetTileType()
+	public ModuleType GetTileType()
 	{
 		return type;
 	}
 
-	public void SetTileType(TileType value)
+	public void SetTileType(ModuleType value)
 	{
-		if (type != TileType.Unknown)
+		if (type != ModuleType.Unknown)
 			return;
 		type = value;
 	}
@@ -112,10 +103,5 @@ class Tile : ITile
 		if (this.gameObject != null)
 			GameObject.Destroy(this.GetGameObject());
 		gameObject = value;
-	}
-
-	public void SetNumSections(int num)
-	{
-		Sections = new Section[num, num];
 	}
 }

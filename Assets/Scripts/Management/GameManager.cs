@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public Gameboard gameBoard;
     public CameraController cameraController;
 
     private void Awake()
@@ -27,19 +26,19 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            gameBoard.Research(DirectionType.Up);
+            Singleton.Instance.Gameboard.Research(DirectionType.Up);
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            gameBoard.Research(DirectionType.Down);
+            Singleton.Instance.Gameboard.Research(DirectionType.Down);
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            gameBoard.Research(DirectionType.Left);
+            Singleton.Instance.Gameboard.Research(DirectionType.Left);
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            gameBoard.Research(DirectionType.Right);
+            Singleton.Instance.Gameboard.Research(DirectionType.Right);
         }
 
         else if (Input.GetKeyDown(KeyCode.W))
@@ -62,27 +61,27 @@ public class GameManager : MonoBehaviour
 
     private void SetCameraInitialPosition()
     {
-        cameraController.SetPosition(gameBoard.selector.transform.position.x, gameBoard.selector.transform.position.y, -100);
+        cameraController.SetPosition(Singleton.Instance.Gameboard.selector.transform.position.x, Singleton.Instance.Gameboard.selector.transform.position.y, -100);
 	}
 
     private void MoveUp()
     {
         cameraController.MoveCamera(DirectionType.Up);
-        gameBoard.Up();
+        Singleton.Instance.Gameboard.Up();
     }
     private void MoveRight()
     {
         cameraController.MoveCamera(DirectionType.Right);
-        gameBoard.Right();
+        Singleton.Instance.Gameboard.Right();
     }
     private void MoveDown()
     {
         cameraController.MoveCamera(DirectionType.Down);
-        gameBoard.Down();
+        Singleton.Instance.Gameboard.Down();
     }
     private void MoveLeft()
     {
         cameraController.MoveCamera(DirectionType.Left);
-        gameBoard.Left();
+        Singleton.Instance.Gameboard.Left();
     }
 }

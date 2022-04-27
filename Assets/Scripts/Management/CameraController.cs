@@ -26,16 +26,16 @@ public class CameraController : MonoBehaviour
         switch (dir)
         {
             case DirectionType.Up:
-                y += Gameboard.TILE_SIZE;
+                y += Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Right:
-                x += Gameboard.TILE_SIZE;
+                x += Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Down:
-                y -= Gameboard.TILE_SIZE;
+                y -= Gameboard.MODULE_SIZE;
                 break;
             case DirectionType.Left:
-                x -= Gameboard.TILE_SIZE;
+                x -= Gameboard.MODULE_SIZE;
                 break;
             default:
                 break;
