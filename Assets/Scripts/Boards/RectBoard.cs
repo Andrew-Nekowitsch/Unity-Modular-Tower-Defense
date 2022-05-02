@@ -46,11 +46,11 @@ public class RectBoard : IBoard
 
 	public IModule NorthOf(IModule t) => GetModuleAt(t.X, t.Y + 1);
 
-	public IModule EastOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
+	public IModule EastOf(IModule t) => GetModuleAt(t.X - 1, t.Y);
 
 	public IModule SouthOf(IModule t) => GetModuleAt(t.X, t.Y - 1);
 
-	public IModule WestOf(IModule t) => GetModuleAt(t.X - 1, t.Y);
+	public IModule WestOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
 
 	public void ShiftCurrentTile(DirectionType dir)
 	{

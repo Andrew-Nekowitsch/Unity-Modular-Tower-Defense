@@ -4,26 +4,39 @@ using UnityEngine;
 
 public class ModuleSelector : MonoBehaviour
 {
-    public float x;
-    public float y;
+	public Vector2 Position;
+	public CameraTarget cameraTarget;
 
-    public void ShiftSelector(DirectionType dir)
-    {
-        switch (dir)
-        {
-            case DirectionType.Up:
-                y += Gameboard.MODULE_SIZE;
-                break;
-            case DirectionType.Right:
-                x += Gameboard.MODULE_SIZE;
-                break;
-            case DirectionType.Down:
-                y -= Gameboard.MODULE_SIZE;
-                break;
-            case DirectionType.Left:
-                x -= Gameboard.MODULE_SIZE;
-                break;
-        }
-        gameObject.transform.position = new Vector3(x, y, 0);
-    }
+	private void Awake()
+	{
+		if (cameraTarget == null)
+			cameraTarget = GetComponent<CameraTarget>();
+	}
+
+	public void SetPos(Vector3 pos)
+	{
+		transform.position = pos;
+		Position = (Vector2)transform.position;
+		cameraTarget.SetPos(Position);
+	}
+
+	public void ShiftSelector(DirectionType dir)
+	{
+		switch (dir)
+		{
+			case DirectionType.Up:
+				Position.y += Gameboard.MODULE_SIZE;
+				break;
+			case DirectionType.Down:
+				Position.y -= Gameboard.MODULE_SIZE;
+				break;
+			case DirectionType.Left:
+				Position.x += Gameboard.MODULE_SIZE;
+				break;
+			case DirectionType.Right:
+				Position.x -= Gameboard.MODULE_SIZE;
+				break;
+		}
+		SetPos(new Vector3(Position.x, Position.y, Gameboard.MODULE_SIZE));
+	}
 }

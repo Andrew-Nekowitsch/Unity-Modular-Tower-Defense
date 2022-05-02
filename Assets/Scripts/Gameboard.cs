@@ -15,7 +15,6 @@ public class Gameboard : MonoBehaviour
 	public GameObject prefab_Border;
 	public GameObject prefab_Obstacle;
 	public GameObject prefab_End;
-	public GameObject prefab_Selector;
 
 
 	private void Start()
@@ -40,7 +39,7 @@ public class Gameboard : MonoBehaviour
 	public void InitializeBoard()
 	{
 		Setup();
-		InstantiateSelector(gameObject.transform, new Vector3(board.StartingModule.X * MODULE_SIZE, board.StartingModule.Y * MODULE_SIZE, 0));
+		InstantiateSelector(new Vector3(board.StartingModule.X * MODULE_SIZE, board.StartingModule.Y * MODULE_SIZE, 5));
 	}
 
 	public void Setup()
@@ -92,13 +91,9 @@ public class Gameboard : MonoBehaviour
 		board.InstantiateModule(board.CurrentModule, GetPrefab(ModuleType.Start));
 	}
 
-	public void InstantiateSelector(Transform t, Vector3 pos)
+	public void InstantiateSelector(Vector3 pos)
 	{
-		GameObject go = GameObject.Instantiate(prefab_Selector, t);
-		selector = go.GetComponent<ModuleSelector>();
-		go.transform.position = pos;
-		selector.x = pos.x;
-		selector.y = pos.y;
+		selector.SetPos(pos);
 	}
 
 	private GameObject GetPrefab(ModuleType type)
