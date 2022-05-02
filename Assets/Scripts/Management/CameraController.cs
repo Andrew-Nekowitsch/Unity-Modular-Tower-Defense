@@ -11,9 +11,6 @@ public class CameraController : MonoBehaviour
 	{
 		if (Cam == null) return;
 		if (CamTarget == null) return;
-		Debug.Log(CamTarget.TargetPosition);
-		Debug.Log(CamTarget.Offset);
-		Debug.Log(CamTarget.TargetPosition + CamTarget.Offset);
 		Cam.transform.position = CamTarget.TargetPosition + CamTarget.Offset;
 		Cam.transform.LookAt(CamTarget.TargetPosition);
 	}
