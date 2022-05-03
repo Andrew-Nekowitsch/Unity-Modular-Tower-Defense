@@ -22,3 +22,10 @@ public enum ModuleType
 	Obstacle,
 	End
 }
+
+public enum TileType
+{
+	None,
+	Grass,
+	Path
+}

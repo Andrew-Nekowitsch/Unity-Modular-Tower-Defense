@@ -130,26 +130,54 @@ public class Gameboard : MonoBehaviour
 		if (dir == DirectionType.Up)
 		{
 			ResearchModule(board.NorthOf(board.CurrentModule), DirectionType.Up);
-			board.NorthOf(board.CurrentModule).Tiles?.SetDown();
-			board.CurrentModule.Tiles?.SetUp();
+			if (board.NorthOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
+			{
+				board.CurrentModule.Tiles?.GrassUp();
+			}
+			else
+			{
+				board.NorthOf(board.CurrentModule).Tiles?.PathDown();
+				board.CurrentModule.Tiles?.PathUp();
+			}
 		}
 		else if (dir == DirectionType.Down)
 		{
 			ResearchModule(board.SouthOf(board.CurrentModule), DirectionType.Down);
-			board.SouthOf(board.CurrentModule).Tiles?.SetUp();
-			board.CurrentModule.Tiles?.SetDown();
+			if (board.SouthOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
+			{
+				board.CurrentModule.Tiles?.GrassDown();
+			}
+			else
+			{
+				board.SouthOf(board.CurrentModule).Tiles?.PathUp();
+				board.CurrentModule.Tiles?.PathDown();
+			}
 		}
 		else if (dir == DirectionType.Right)
 		{
 			ResearchModule(board.EastOf(board.CurrentModule), DirectionType.Right);
-			board.EastOf(board.CurrentModule).Tiles?.SetLeft();
-			board.CurrentModule.Tiles?.SetRight();
+			if (board.EastOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
+			{
+				board.CurrentModule.Tiles?.GrassRight();
+			}
+			else
+			{
+				board.EastOf(board.CurrentModule).Tiles?.PathLeft();
+				board.CurrentModule.Tiles?.PathRight();
+			}
 		}
 		else if (dir == DirectionType.Left)
 		{
 			ResearchModule(board.WestOf(board.CurrentModule), DirectionType.Left);
-			board.WestOf(board.CurrentModule).Tiles?.SetRight();
-			board.CurrentModule.Tiles?.SetLeft();
+			if (board.WestOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
+			{
+				board.CurrentModule.Tiles?.GrassLeft();
+			}
+			else
+			{
+				board.WestOf(board.CurrentModule).Tiles?.PathRight();
+				board.CurrentModule.Tiles?.PathLeft();
+			}
 		}
 	}
 

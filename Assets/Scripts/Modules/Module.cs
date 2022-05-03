@@ -27,6 +27,14 @@ class Module : IModule
 		Initialize(x, y);
 	}
 
+	public void Set(IModule m)
+	{
+		WalkDir = m.WalkDir;
+		Tiles = m.Tiles;
+		visible = m.GetVisible();
+		type = m.GetModuleType();
+	}
+
 	public void Instantiate(GameObject prefab, GameObject parent)
 	{
 		this.SetGameObject(
@@ -34,8 +42,12 @@ class Module : IModule
 				new Vector3(X * Gameboard.MODULE_SIZE, Y * Gameboard.MODULE_SIZE, 0), Quaternion.identity, parent.transform));
 		if (GetModuleType() == ModuleType.Path)
 		{
+			Tiles old = Tiles;
 			Tiles = this.GetGameObject().GetComponent<Tiles>();
-			Tiles.Initialize();
+			if (old != null)
+				Tiles.Initialize(old);
+			else
+				Tiles.Initialize();
 		}
 	}
 

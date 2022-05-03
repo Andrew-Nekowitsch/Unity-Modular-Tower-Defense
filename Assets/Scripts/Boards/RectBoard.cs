@@ -30,11 +30,11 @@ public class RectBoard : IBoard
 		}
 	}
 
-	public void InstantiateBorder(IModule tile)
+	public void InstantiateBorder(IModule module)
 	{
-		GameObject objParentInHierarchy = GameObject.Find(tile.ToString());
-		tile.Instantiate(gb.prefab_Border, objParentInHierarchy);
-		tile.SetVisibility(Visibility.Hidden);
+		GameObject objParentInHierarchy = GameObject.Find(module.ToString());
+		module.Instantiate(gb.prefab_Border, objParentInHierarchy);
+		module.SetVisibility(Visibility.Hidden);
 	}
 
 	public IModule GetModuleAt(int x, int y)
@@ -46,11 +46,11 @@ public class RectBoard : IBoard
 
 	public IModule NorthOf(IModule t) => GetModuleAt(t.X, t.Y + 1);
 
-	public IModule EastOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
-
 	public IModule SouthOf(IModule t) => GetModuleAt(t.X, t.Y - 1);
 
 	public IModule WestOf(IModule t) => GetModuleAt(t.X - 1, t.Y);
+
+	public IModule EastOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
 
 	public void ShiftCurrentTile(DirectionType dir)
 	{
@@ -98,12 +98,16 @@ public class RectBoard : IBoard
 	{
 		if (InvalidTileLocation(t))
 			return false;
-		Modules[t.X, t.Y] = t;
+		if (Modules[t.X, t.Y] == null)
+			Modules[t.X, t.Y] = t;
+		else
+			Modules[t.X, t.Y].Set(t);
 		return true;
 	}
 
 	public void Research(IModule t, GameObject prefab)
 	{
+		if (t.GetVisible() == Visibility.Visible) return;
 		Add(t, prefab);
 	}
 

@@ -1,11 +1,6 @@
 using UnityEngine;
 
-public interface ITile
-{
-
-}
-
-public class Tiles : MonoBehaviour, ITile
+public class Tiles : MonoBehaviour
 {
 	public GameObject Up;
 	public GameObject Down;
@@ -19,81 +14,122 @@ public class Tiles : MonoBehaviour, ITile
 	public GameObject DR;
 	public GameObject Inner;
 
-	private bool up = false;
-	private bool down = false;
-	private bool left = false;
-	private bool right = false;
-	private bool center = false;
-	private bool initialized = false;
+	public GameObject gUp;
+	public GameObject gDown;
+	public GameObject gLeft;
+	public GameObject gRight;
+
+	public GameObject pUp;
+	public GameObject pDown;
+	public GameObject pLeft;
+	public GameObject pRight;
+
+	[SerializeField] private TileType up = TileType.None;
+	[SerializeField] private TileType down = TileType.None;
+	[SerializeField] private TileType left = TileType.None;
+	[SerializeField] private TileType right = TileType.None;
+	[SerializeField] private bool center = false;
+	[SerializeField] private bool initialized = false;
 
 	public void Initialize()
 	{
-		if (initialized) return;
+		if (initialized == true) return;
 		initialized = true;
+
 		Up.SetActive(false);
 		Down.SetActive(false);
 		Left.SetActive(false);
 		Right.SetActive(false);
+
 		Center.SetActive(false);
+		Inner.SetActive(false);
+
 		UL.SetActive(false);
 		UR.SetActive(false);
 		DL.SetActive(false);
 		DR.SetActive(false);
-		Inner.SetActive(false);
+
+		gUp.SetActive(false);
+		gDown.SetActive(false);
+		gLeft.SetActive(false);
+		gRight.SetActive(false);
+
+		pUp.SetActive(false);
+		pDown.SetActive(false);
+		pLeft.SetActive(false);
+		pRight.SetActive(false);
+	}
+
+	public void Initialize(Tiles t)
+	{
+		Initialize();
+		if (t.up == TileType.Path) PathUp();
+		else if (t.up == TileType.Grass) GrassUp();
+		if (t.down == TileType.Path) PathDown();
+		else if (t.down == TileType.Grass) GrassDown();
+		if (t.left == TileType.Path) PathLeft();
+		else if (t.left == TileType.Grass) GrassLeft();
+		if (t.right == TileType.Path) PathRight();
+		else if (t.right == TileType.Grass) GrassRight();
+		if (t.center) SetCenter();
 	}
 
 	public void Reset()
 	{
 		initialized = false;
-		up = false;
-		down = false;
-		left = false;
-		right = false;
 		center = false;
+		up = TileType.None;
+		down = TileType.None;
+		left = TileType.None;
+		right = TileType.None;
 	}
 
-	public void SetUp()
+	public void PathUp()
 	{
-		if (up == true) return;
+		if (up != TileType.None) return;
 
-		up = true;
+		up = TileType.Path;
 		SetCenter();
 		Up.SetActive(true);
 		UL.SetActive(true);
 		UR.SetActive(true);
+		pUp.SetActive(true);
 	}
 
-	public void SetDown()
+	public void PathDown()
 	{
-		if (down == true) return;
+		if (down != TileType.None) return;
 
-		down = true;
+		down = TileType.Path;
 		SetCenter();
 		Down.SetActive(true);
 		DL.SetActive(true);
 		DR.SetActive(true);
+		pDown.SetActive(true);
 	}
 
-	public void SetLeft()
+	public void PathLeft()
 	{
-		if (left == true) return;
+		if (left != TileType.None) return;
 
-		left = true;
+		left = TileType.Path;
 		SetCenter();
 		Left.SetActive(true);
 		UL.SetActive(true);
 		DL.SetActive(true);
+		pLeft.SetActive(true);
 	}
 
-	public void SetRight()
+	public void PathRight()
 	{
-		if (right == true) return;
+		if (right != TileType.None) return;
 
-		right = true;
+		right = TileType.Path;
 		SetCenter();
 		Right.SetActive(true);
 		UR.SetActive(true);
 		DR.SetActive(true);
+		pRight.SetActive(true);
 	}
 
 	private void SetCenter()
@@ -103,5 +139,53 @@ public class Tiles : MonoBehaviour, ITile
 		center = true;
 		Center.SetActive(true);
 		Inner.SetActive(true);
+	}
+
+	public void GrassUp()
+	{
+		if (up != TileType.None) return;
+
+		up = TileType.Grass;
+		SetCenter();
+		Up.SetActive(true);
+		UL.SetActive(true);
+		UR.SetActive(true);
+		gUp.SetActive(true);
+	}
+
+	public void GrassDown()
+	{
+		if (down != TileType.None) return;
+
+		down = TileType.Grass;
+		SetCenter();
+		Down.SetActive(true);
+		DL.SetActive(true);
+		DR.SetActive(true);
+		gDown.SetActive(true);
+	}
+
+	public void GrassLeft()
+	{
+		if (left != TileType.None) return;
+
+		left = TileType.Grass;
+		SetCenter();
+		Left.SetActive(true);
+		UL.SetActive(true);
+		DL.SetActive(true);
+		gLeft.SetActive(true);
+	}
+
+	public void GrassRight()
+	{
+		if (right != TileType.None) return;
+
+		right = TileType.Grass;
+		SetCenter();
+		Right.SetActive(true);
+		UR.SetActive(true);
+		DR.SetActive(true);
+		gRight.SetActive(true);
 	}
 }

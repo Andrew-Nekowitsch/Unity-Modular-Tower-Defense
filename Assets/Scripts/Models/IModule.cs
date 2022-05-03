@@ -14,6 +14,8 @@ public interface IModule
 	void SetGameObject(GameObject value);
 	GameObject GetGameObject();
 
+    void Set(IModule m);
+
     void SetVisibility(Visibility v);
     void Initialize(int x, int y);
     void SetCoordinates(int x, int y);
