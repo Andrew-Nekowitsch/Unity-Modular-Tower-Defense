@@ -14,17 +14,17 @@ public class EM_TestGameboard
         board.height = 3;
         board.board = new RectBoard();
 
-        Assert.AreEqual(board.board.Modules[0, 0].GetTileType(), ModuleType.Border);
-        Assert.AreEqual(board.board.Modules[0, 1].GetTileType(), ModuleType.Border);
-        Assert.AreEqual(board.board.Modules[0, 2].GetTileType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[0, 0].GetModuleType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[0, 1].GetModuleType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[0, 2].GetModuleType(), ModuleType.Border);
         
-        Assert.AreEqual(board.board.Modules[1, 0].GetTileType(), ModuleType.Border);
-        Assert.AreEqual(board.board.Modules[1, 1].GetTileType(), ModuleType.Start);
-        Assert.AreEqual(board.board.Modules[1, 2].GetTileType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[1, 0].GetModuleType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[1, 1].GetModuleType(), ModuleType.Start);
+        Assert.AreEqual(board.board.Modules[1, 2].GetModuleType(), ModuleType.Border);
 
-        Assert.AreEqual(board.board.Modules[2, 0].GetTileType(), ModuleType.Border);
-        Assert.AreEqual(board.board.Modules[2, 1].GetTileType(), ModuleType.Border);
-        Assert.AreEqual(board.board.Modules[2, 2].GetTileType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[2, 0].GetModuleType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[2, 1].GetModuleType(), ModuleType.Border);
+        Assert.AreEqual(board.board.Modules[2, 2].GetModuleType(), ModuleType.Border);
 
     }
 }

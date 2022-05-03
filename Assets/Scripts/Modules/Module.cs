@@ -4,7 +4,6 @@ class Module : IModule
 {
 	public int X { get; set; }
 	public int Y { get; set; }
-	public Neighbors Neighbors { get; set; }
 	public DirectionType WalkDir { get; set; }
 	public Tiles Tiles { get; set; }
 	private Visibility visible;
@@ -14,7 +13,7 @@ class Module : IModule
 	public Module(ModuleType type)
 	{
 		this.SetVisible(Visibility.Hidden);
-		this.SetTileType(type);
+		this.SetModuleType(type);
 	}
 	public Module(int x, int y)
 	{
@@ -24,7 +23,7 @@ class Module : IModule
 	public Module(int x, int y, ModuleType type)
 	{
 		this.SetVisible(Visibility.Hidden);
-		this.SetTileType(type);
+		this.SetModuleType(type);
 		Initialize(x, y);
 	}
 
@@ -32,11 +31,12 @@ class Module : IModule
 	{
 		this.SetGameObject(
 			GameObject.Instantiate(prefab,
-				new Vector3(X * Gameboard.MODULE_SIZE, Y * Gameboard.MODULE_SIZE, 0),
-				Quaternion.identity, parent.transform)
-				);
-		this.GetGameObject().name = "[" + X + ", " + Y + "]";
-		Tiles = this.GetGameObject().GetComponent<Tiles>();
+				new Vector3(X * Gameboard.MODULE_SIZE, Y * Gameboard.MODULE_SIZE, 0), Quaternion.identity, parent.transform));
+		if (GetModuleType() == ModuleType.Path)
+		{
+			Tiles = this.GetGameObject().GetComponent<Tiles>();
+			Tiles.Initialize();
+		}
 	}
 
 	public void SetVisibility(Visibility v)
@@ -48,7 +48,6 @@ class Module : IModule
 	public void Initialize(int x, int y)
 	{
 		SetVisible(Visibility.Hidden);
-		Neighbors = new Neighbors();
 		SetCoordinates(x, y);
 	}
 
@@ -58,25 +57,17 @@ class Module : IModule
 		this.Y = y;
 	}
 
-	public void SetNeighbors(IModule n, IModule e, IModule s, IModule w)
-	{
-		Neighbors.north = n;
-		Neighbors.east = e;
-		Neighbors.south = s;
-		Neighbors.west = w;
-	}
-
 	public override string ToString()
 	{
-		return GetTileType().ToString();
+		return GetModuleType().ToString();
 	}
 
-	public ModuleType GetTileType()
+	public ModuleType GetModuleType()
 	{
 		return type;
 	}
 
-	public void SetTileType(ModuleType value)
+	public void SetModuleType(ModuleType value)
 	{
 		if (type != ModuleType.Unknown)
 			return;
@@ -103,5 +94,6 @@ class Module : IModule
 		if (this.gameObject != null)
 			GameObject.Destroy(this.GetGameObject());
 		gameObject = value;
+		this.GetGameObject().name = "[" + X + ", " + Y + "]";
 	}
 }

@@ -8,24 +8,24 @@ public class RectBoard : IBoard
 	public IModule CurrentModule { get; set; }
 	private readonly Gameboard gb = Singleton.Instance.Gameboard;
 
-	public void InstantiateModule(IModule tile, GameObject prefab)
+	public void InstantiateModule(IModule module, GameObject prefab)
 	{
-		tile.Instantiate(prefab, GameObject.Find(tile.ToString()));
+		module.Instantiate(prefab, GameObject.Find(module.ToString()));
 
-		if (tile.GetTileType() == ModuleType.Border && tile.GetVisible() == Visibility.Unknown)
+		if (module.GetModuleType() == ModuleType.Border && module.GetVisible() == Visibility.Unknown)
 		{
-			tile.SetVisibility(Visibility.Visible);
+			module.SetVisibility(Visibility.Visible);
 			return;
 		}
 
-		IModule[] neighbors = { NorthOf(tile), EastOf(tile), SouthOf(tile), WestOf(tile) };
-		foreach (IModule tileRef in neighbors)
+		IModule[] neighbors = { NorthOf(module), EastOf(module), SouthOf(module), WestOf(module) };
+		foreach (IModule moduleRef in neighbors)
 		{
-			if (tileRef == null) continue;
-			if (tileRef.GetTileType() == ModuleType.Unknown || (tileRef.GetTileType() == ModuleType.Border && tileRef.GetVisible() == Visibility.Hidden))
+			if (moduleRef == null) continue;
+			if (moduleRef.GetModuleType() == ModuleType.Unknown || (moduleRef.GetModuleType() == ModuleType.Border && moduleRef.GetVisible() == Visibility.Hidden))
 			{
-				tileRef.Instantiate(gb.prefab_Unknown, GameObject.Find(tileRef.ToString()));
-				tile.SetVisibility(Visibility.Unknown);
+				moduleRef.Instantiate(gb.prefab_Unknown, GameObject.Find(moduleRef.ToString()));
+				module.SetVisibility(Visibility.Unknown);
 			}
 		}
 	}
@@ -46,11 +46,11 @@ public class RectBoard : IBoard
 
 	public IModule NorthOf(IModule t) => GetModuleAt(t.X, t.Y + 1);
 
-	public IModule EastOf(IModule t) => GetModuleAt(t.X - 1, t.Y);
+	public IModule EastOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
 
 	public IModule SouthOf(IModule t) => GetModuleAt(t.X, t.Y - 1);
 
-	public IModule WestOf(IModule t) => GetModuleAt(t.X + 1, t.Y);
+	public IModule WestOf(IModule t) => GetModuleAt(t.X - 1, t.Y);
 
 	public void ShiftCurrentTile(DirectionType dir)
 	{
@@ -86,16 +86,6 @@ public class RectBoard : IBoard
 
 	public bool Add(IModule t, GameObject prefab)
 	{
-		if (AddWithoutNeighbors(t, prefab))
-		{
-			SetNeighbors(t);
-			return true;
-		}
-		return false;
-	}
-
-	public bool AddWithoutNeighbors(IModule t, GameObject prefab)
-	{
 		if (AddWithoutInstantiation(t))
 		{
 			InstantiateModule(Modules[t.X, t.Y], prefab);
@@ -117,19 +107,6 @@ public class RectBoard : IBoard
 		Add(t, prefab);
 	}
 
-	public void SetNeighbors()
-	{
-		for (int x = 0; x < gb.width; x++)
-		{
-			for (int y = 0; y < gb.height; y++)
-			{
-				SetNeighbors(Modules[x, y]);
-			}
-		}
-	}
-
-	public void SetNeighbors(IModule t) => t.SetNeighbors(NorthOf(t), SouthOf(t), EastOf(t), WestOf(t));
-
 	public bool InvalidTileLocation(IModule t) => InvalidTileLocation(t.X, t.Y);
 
 	public bool InvalidTileLocation(int x, int y) => x < 0 || x >= gb.width || y < 0 || y >= gb.height;
@@ -145,7 +122,7 @@ public class RectBoard : IBoard
 				if (GetModuleAt(x, y) == null)
 					str += "null??\t";
 				else
-					str += GetModuleAt(x, y).GetTileType().ToString().Substring(0, 1).ToUpper() + "\t";
+					str += GetModuleAt(x, y).GetModuleType().ToString().Substring(0, 1).ToUpper() + "\t";
 			}
 			str += "\n";
 		}

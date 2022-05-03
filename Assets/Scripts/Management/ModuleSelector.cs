@@ -13,9 +13,9 @@ public class ModuleSelector : MonoBehaviour
 			cameraTarget = GetComponent<CameraTarget>();
 	}
 
-	public void SetPos(Vector3 pos)
+	public void SetPos(Vector2 pos)
 	{
-		transform.position = pos;
+		transform.position = new Vector3(pos.x, pos.y, 0);
 		Position = (Vector2)transform.position;
 		cameraTarget.SetPos(Position);
 	}
@@ -31,12 +31,12 @@ public class ModuleSelector : MonoBehaviour
 				Position.y -= Gameboard.MODULE_SIZE;
 				break;
 			case DirectionType.Left:
-				Position.x += Gameboard.MODULE_SIZE;
-				break;
-			case DirectionType.Right:
 				Position.x -= Gameboard.MODULE_SIZE;
 				break;
+			case DirectionType.Right:
+				Position.x += Gameboard.MODULE_SIZE;
+				break;
 		}
-		SetPos(new Vector3(Position.x, Position.y, Gameboard.MODULE_SIZE));
+		SetPos(new Vector3(Position.x, Position.y));
 	}
 }

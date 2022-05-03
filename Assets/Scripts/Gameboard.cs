@@ -39,7 +39,7 @@ public class Gameboard : MonoBehaviour
 	public void InitializeBoard()
 	{
 		Setup();
-		InstantiateSelector(new Vector3(board.StartingModule.X * MODULE_SIZE, board.StartingModule.Y * MODULE_SIZE, 5));
+		InstantiateSelector(new Vector3(board.StartingModule.X * MODULE_SIZE, board.StartingModule.Y * MODULE_SIZE, 0));
 	}
 
 	public void Setup()
@@ -76,8 +76,6 @@ public class Gameboard : MonoBehaviour
 				board.AddWithoutInstantiation(new Module(x, y, ModuleType.Unknown));
 			}
 		}
-
-		board.SetNeighbors();
 	}
 
 	public void InitializeStartingLocation()
@@ -85,7 +83,7 @@ public class Gameboard : MonoBehaviour
 		int x = Random.Range(1, width - 1);
 		int y = Random.Range(1, height - 1);
 		board.StartingModule = board.GetModuleAt(x, y);
-		board.StartingModule.SetTileType(ModuleType.Start);
+		board.StartingModule.SetModuleType(ModuleType.Start);
 		board.CurrentModule = board.StartingModule;
 		board.CurrentModule.SetVisible(Visibility.Visible);
 		board.InstantiateModule(board.CurrentModule, GetPrefab(ModuleType.Start));
@@ -126,41 +124,51 @@ public class Gameboard : MonoBehaviour
 
 	public void Research(DirectionType dir)
 	{
-		if (board.CurrentModule.GetTileType() != ModuleType.Path && board.CurrentModule.GetTileType() != ModuleType.Start)
+		if (board.CurrentModule.GetModuleType() != ModuleType.Path && board.CurrentModule.GetModuleType() != ModuleType.Start)
 			return;
 
 		if (dir == DirectionType.Up)
 		{
-			ResearchTile(board.NorthOf(board.CurrentModule));
+			ResearchModule(board.NorthOf(board.CurrentModule), DirectionType.Up);
+			board.NorthOf(board.CurrentModule).Tiles?.SetDown();
+			board.CurrentModule.Tiles?.SetUp();
 		}
 		else if (dir == DirectionType.Down)
 		{
-			ResearchTile(board.SouthOf(board.CurrentModule));
+			ResearchModule(board.SouthOf(board.CurrentModule), DirectionType.Down);
+			board.SouthOf(board.CurrentModule).Tiles?.SetUp();
+			board.CurrentModule.Tiles?.SetDown();
 		}
 		else if (dir == DirectionType.Right)
 		{
-			ResearchTile(board.EastOf(board.CurrentModule));
+			ResearchModule(board.EastOf(board.CurrentModule), DirectionType.Right);
+			board.EastOf(board.CurrentModule).Tiles?.SetLeft();
+			board.CurrentModule.Tiles?.SetRight();
 		}
 		else if (dir == DirectionType.Left)
 		{
-			ResearchTile(board.WestOf(board.CurrentModule));
+			ResearchModule(board.WestOf(board.CurrentModule), DirectionType.Left);
+			board.WestOf(board.CurrentModule).Tiles?.SetRight();
+			board.CurrentModule.Tiles?.SetLeft();
 		}
 	}
 
-	private void ResearchTile(IModule tile)
+	private void ResearchModule(IModule module, DirectionType dir)
 	{
-		if (tile.GetVisible() == Visibility.Visible)
+		if (module == null)
 			return;
-		if (tile.GetTileType() != ModuleType.Border)
+		if (module.GetVisible() == Visibility.Visible)
+			return;
+		if (module.GetModuleType() != ModuleType.Border)
 		{
-			tile = board.GetModuleAt(tile.X, tile.Y);
-			tile.SetTileType(GenerateTileType());
+			module = board.GetModuleAt(module.X, module.Y);
+			module.SetModuleType(GenerateTileType());
 		}
-		board.Research(tile, GetPrefab(tile.GetTileType()));
+		board.Research(module, GetPrefab(module.GetModuleType()));
 	}
 
 	// TODO: make variable odds based on currently placed tiles
-	private ModuleType GenerateTileType()
+	public ModuleType GenerateTileType()
 	{
 		ModuleType type;
 		int num = Random.Range(0, 100);
