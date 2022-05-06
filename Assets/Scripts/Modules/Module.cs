@@ -103,9 +103,29 @@ class Module : IModule
 
 	public void SetGameObject(GameObject value)
 	{
-		if (this.gameObject != null)
-			GameObject.Destroy(this.GetGameObject());
+		if (GetGameObject() != null)
+			GetGameObject().transform.DestroyChildrenRecursive();
 		gameObject = value;
-		this.GetGameObject().name = "[" + X + ", " + Y + "]";
+		GetGameObject().name = "[" + X + ", " + Y + "]";
+	}
+
+	public IModule Up()
+	{
+		return Singleton.Instance.Gameboard.board.NorthOf(this);
+	}
+
+	public IModule Down()
+	{
+		return Singleton.Instance.Gameboard.board.SouthOf(this);
+	}
+
+	public IModule Left()
+	{
+		return Singleton.Instance.Gameboard.board.WestOf(this);
+	}
+
+	public IModule Right()
+	{
+		return Singleton.Instance.Gameboard.board.EastOf(this);
 	}
 }

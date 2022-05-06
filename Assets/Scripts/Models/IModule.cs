@@ -21,4 +21,8 @@ public interface IModule
     void SetCoordinates(int x, int y);
     string ToString();
     void Instantiate(GameObject prefab, GameObject parent);
+    IModule Up();
+    IModule Down();
+    IModule Left();
+    IModule Right();
 }

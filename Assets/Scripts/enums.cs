@@ -1,4 +1,3 @@
-
 public enum Visibility
 {
 	Hidden,
@@ -22,7 +21,6 @@ public enum ModuleType
 	Obstacle,
 	End
 }
-
 public enum TileType
 {
 	None,

@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Linq;
+using Sirenix.OdinInspector;
 
 public class Gameboard : MonoBehaviour
 {
@@ -127,61 +129,115 @@ public class Gameboard : MonoBehaviour
 		if (board.CurrentModule.GetModuleType() != ModuleType.Path && board.CurrentModule.GetModuleType() != ModuleType.Start)
 			return;
 
+		ResearchModule(dir);
+		ActivateTiles(dir);
+	}
+
+	private void ActivateTiles(DirectionType dir)
+	{
+		IModule curMod = board.CurrentModule;
 		if (dir == DirectionType.Up)
 		{
-			ResearchModule(board.NorthOf(board.CurrentModule), DirectionType.Up);
-			if (board.NorthOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
-			{
-				board.CurrentModule.Tiles?.GrassUp();
-			}
-			else
-			{
-				board.NorthOf(board.CurrentModule).Tiles?.PathDown();
-				board.CurrentModule.Tiles?.PathUp();
-			}
+			ActivateUp(); ActivateLeft(); ActivateRight();
 		}
 		else if (dir == DirectionType.Down)
 		{
-			ResearchModule(board.SouthOf(board.CurrentModule), DirectionType.Down);
-			if (board.SouthOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
-			{
-				board.CurrentModule.Tiles?.GrassDown();
-			}
-			else
-			{
-				board.SouthOf(board.CurrentModule).Tiles?.PathUp();
-				board.CurrentModule.Tiles?.PathDown();
-			}
+			ActivateDown(); ActivateLeft(); ActivateRight();
 		}
 		else if (dir == DirectionType.Right)
 		{
-			ResearchModule(board.EastOf(board.CurrentModule), DirectionType.Right);
-			if (board.EastOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
-			{
-				board.CurrentModule.Tiles?.GrassRight();
-			}
-			else
-			{
-				board.EastOf(board.CurrentModule).Tiles?.PathLeft();
-				board.CurrentModule.Tiles?.PathRight();
-			}
+			ActivateRight(); ActivateDown(); ActivateUp();
 		}
 		else if (dir == DirectionType.Left)
 		{
-			ResearchModule(board.WestOf(board.CurrentModule), DirectionType.Left);
-			if (board.WestOf(board.CurrentModule).GetModuleType() != ModuleType.Path)
+			ActivateLeft(); ActivateDown(); ActivateUp();
+		}
+
+		void ActivateUp()
+		{
+			if (curMod.Up().GetModuleType() != ModuleType.Path && curMod.Up().GetModuleType() != ModuleType.Unknown)
 			{
-				board.CurrentModule.Tiles?.GrassLeft();
+				curMod.Tiles?.GrassUp();
+			}
+			else if (curMod.Up().GetVisible() == Visibility.Visible || curMod.Up().GetModuleType() == ModuleType.Path)
+			{
+				curMod.Up().Tiles?.GrassDown();
+				curMod.Tiles?.GrassUp();
 			}
 			else
 			{
-				board.WestOf(board.CurrentModule).Tiles?.PathRight();
-				board.CurrentModule.Tiles?.PathLeft();
+				curMod.Up().Tiles?.PathDown();
+				curMod.Tiles?.PathUp();
+			}
+		}
+		void ActivateDown()
+		{
+			if (curMod.Down().GetModuleType() != ModuleType.Path && curMod.Up().GetModuleType() != ModuleType.Unknown)
+			{
+				curMod.Tiles?.GrassDown();
+			}
+			else if (curMod.Down().GetVisible() == Visibility.Visible && curMod.Down().GetModuleType() == ModuleType.Path)
+			{
+				curMod.Down().Tiles?.GrassUp();
+				curMod.Tiles?.GrassDown();
+			}
+			else
+			{
+				curMod.Down().Tiles?.PathUp();
+				curMod.Tiles?.PathDown();
+			}
+		}
+		void ActivateLeft()
+		{
+			if (curMod.Left().GetModuleType() != ModuleType.Path && curMod.Left().GetModuleType() != ModuleType.Unknown)
+			{
+				curMod.Tiles?.GrassLeft();
+			}
+			else if (curMod.Left().GetVisible() == Visibility.Visible && curMod.Left().GetModuleType() == ModuleType.Path)
+			{
+				curMod.Left().Tiles?.GrassRight();
+				curMod.Tiles?.GrassLeft();
+			}
+			else
+			{
+				curMod.Left().Tiles?.PathRight();
+				curMod.Tiles?.PathLeft();
+			}
+		}
+		void ActivateRight()
+		{
+			if (curMod.Right().GetModuleType() != ModuleType.Path && curMod.Right().GetModuleType() != ModuleType.Unknown)
+			{
+				curMod.Tiles?.GrassRight();
+			}
+			else if (curMod.Right().GetVisible() == Visibility.Visible && curMod.Right().GetModuleType() == ModuleType.Path)
+			{
+				curMod.Right().Tiles?.GrassLeft();
+				curMod.Tiles?.GrassRight();
+			}
+			else
+			{
+				curMod.Right().Tiles?.PathLeft();
+				curMod.Tiles?.PathRight();
 			}
 		}
 	}
 
-	private void ResearchModule(IModule module, DirectionType dir)
+	private void ResearchModule(DirectionType dir)
+	{
+		IModule curMod = board.CurrentModule;
+
+		if (dir == DirectionType.Up)
+			ResearchModule(curMod.Up());
+		else if (dir == DirectionType.Down)
+			ResearchModule(curMod.Down());
+		else if (dir == DirectionType.Right)
+			ResearchModule(curMod.Right());
+		else if (dir == DirectionType.Left)
+			ResearchModule(curMod.Left());
+	}
+
+	private void ResearchModule(IModule module)
 	{
 		if (module == null)
 			return;
@@ -189,7 +245,6 @@ public class Gameboard : MonoBehaviour
 			return;
 		if (module.GetModuleType() != ModuleType.Border)
 		{
-			module = board.GetModuleAt(module.X, module.Y);
 			module.SetModuleType(GenerateTileType());
 		}
 		board.Research(module, GetPrefab(module.GetModuleType()));
